@@ -83,6 +83,10 @@ class Depends(Property):
 class Prompt(Property):
     prompt_str = Field()
 
+class Range(Property):
+    low = Field()
+    high = Field()
+
 @abstract
 class Expression(KConfigNode):
     pass
@@ -124,7 +128,8 @@ kconfig_grammar.add_rules(
                            G.default_exp,
                            G.depends_exp,
                            G.select_exp,
-                           G.help_exp)),
+                           G.help_exp,
+                           G.range_exp)),
 
     config_list=List(G.config_rule),
 
@@ -136,7 +141,8 @@ kconfig_grammar.add_rules(
                                G.default_exp,
                                G.depends_exp,
                                G.select_exp,
-                               G.help_exp)),
+                               G.help_exp,
+                               G.range_exp)),
 
     # Menu
     menu_rule=Row('menu', G.string_literal, G.root_rule, 'endmenu') ^ Menu,
@@ -194,6 +200,8 @@ kconfig_grammar.add_rules(
     select_exp=Row('select', G.identifier) ^ Select,
 
     depends_exp=Row('depends', 'on', G.expr) ^ Depends,
+
+    range_exp=Row('range', G.value_exp, G.value_exp) ^ Range,
 
     source_rule=Row('source', G.string_literal) ^ Source,
 
