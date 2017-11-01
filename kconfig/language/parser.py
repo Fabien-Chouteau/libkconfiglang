@@ -38,6 +38,10 @@ class Select(KConfigNode):
     symbol    = Field()
     condition = Field()
 
+class Imply(KConfigNode):
+    symbol    = Field()
+    condition = Field()
+
 class If(KConfigNode):
     expr  = Field()
     child = Field()
@@ -151,6 +155,7 @@ kconfig_grammar.add_rules(
                            G.default_exp,
                            G.depends_exp,
                            G.select_exp,
+                           G.imply_exp,
                            G.help_exp,
                            G.range_exp,
                            G.comment_exp,
@@ -168,6 +173,7 @@ kconfig_grammar.add_rules(
                                G.default_exp,
                                G.depends_exp,
                                G.select_exp,
+                               G.imply_exp,
                                G.help_exp,
                                G.range_exp,
                                G.comment_exp,
@@ -240,6 +246,8 @@ kconfig_grammar.add_rules(
     def_tristate_exp=Row('def_tristate', G.tristate_literal, G.opt_condition_rule) ^ DefTristate,
 
     select_exp=Row('select', G.identifier, G.opt_condition_rule) ^ Select,
+
+    imply_exp=Row('imply', G.identifier, G.opt_condition_rule) ^ Imply,
 
     depends_exp=Row('depends', 'on', G.expr) ^ Depends,
 

@@ -8,7 +8,8 @@ config TEST_2
        def_tristate m if LOL
        option env="test"
        option defconfig_list
-
+       imply LOL
+       imply LOL if LOL = y
 endmenu
 
 menu "Middleware"
