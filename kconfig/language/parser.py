@@ -131,7 +131,7 @@ kconfig_grammar.add_rules(
                            G.help_exp,
                            G.range_exp)),
 
-    config_list=List(G.config_rule),
+    config_list=List(G.config_rule, empty_valid=True),
 
     # Menuconfig
     menuconfig_rule=Row('menuconfig', G.identifier, G.menuconfig_options) ^ MenuConfig,
