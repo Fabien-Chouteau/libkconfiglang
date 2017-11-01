@@ -152,7 +152,11 @@ kconfig_grammar.add_rules(
 
     # Choice
     choice_rule=Row('choice', G.choice_options, G.config_list, 'endchoice') ^ Choice,
-    choice_options=List(Or(G.depends_exp)),
+    choice_options=List(Or(G.depends_exp,
+                           G.prompt_exp,
+                           G.default_choice_exp)),
+
+    default_choice_exp=Row('default', G.identifier),
 
     # Symbol
     identifier=Tok(Token.Identifier, keep=True) ^ Identifier,
