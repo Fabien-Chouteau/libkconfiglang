@@ -2,6 +2,11 @@ mainmenu "Ada_Drivers_Library Configuration"
 
 menu "Build options"
 
+config TEST_1
+       def_bool y if LOL
+config TEST_2
+       def_tristate m if LOL
+
 endmenu
 
 menu "Middleware"

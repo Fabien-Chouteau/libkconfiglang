@@ -19,7 +19,6 @@ class Token(LexerToken):
     Source = WithText()
     Mainmenu = WithText()
 
-
     Depends = WithText()
     On = WithText()
     Help = WithText()
@@ -38,6 +37,8 @@ class Token(LexerToken):
     # Types
     Tristate = WithText()
     Bool = WithText()
+    DefTristate = WithText()
+    DefBool = WithText()
     Int = WithText()
     Hex = WithText()
     StringType = WithText()
@@ -87,11 +88,13 @@ kconfig_lexer.add_rules(
     (Literal("visible"),    Token.Visible),
 
     # Types
-    (Literal("tristate"), Token.Tristate),
-    (Literal("bool"),     Token.Bool),
-    (Literal("int"),      Token.Int),
-    (Literal("hex"),      Token.Hex),
-    (Literal("string"),   Token.StringType),
+    (Literal("tristate"),     Token.Tristate),
+    (Literal("bool"),         Token.Bool),
+    (Literal("def_tristate"), Token.DefTristate),
+    (Literal("def_bool"),     Token.DefBool),
+    (Literal("int"),          Token.Int),
+    (Literal("hex"),          Token.Hex),
+    (Literal("string"),       Token.StringType),
 
     (Literal("="),    Token.Equal),
     (Literal("!="),   Token.Different),

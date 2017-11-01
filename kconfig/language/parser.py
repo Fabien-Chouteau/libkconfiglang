@@ -85,6 +85,14 @@ class DefaultChoice(Property):
     value     = Field()
     condition = Field()
 
+class DefBool(Property):
+    value     = Field()
+    condition = Field()
+
+class DefTristate(Property):
+    value     = Field()
+    condition = Field()
+
 class Depends(Property):
     identifier = Field()
 
@@ -139,7 +147,9 @@ kconfig_grammar.add_rules(
                            G.select_exp,
                            G.help_exp,
                            G.range_exp,
-                           G.comment_exp)),
+                           G.comment_exp,
+                           G.def_bool_exp,
+                           G.def_tristate_exp)),
 
     config_list=List(G.config_rule, empty_valid=True),
 
@@ -153,7 +163,9 @@ kconfig_grammar.add_rules(
                                G.select_exp,
                                G.help_exp,
                                G.range_exp,
-                               G.comment_exp)),
+                               G.comment_exp,
+                               G.def_bool_exp,
+                               G.def_tristate_exp)),
 
     # Menu
     menu_rule=Row('menu', G.string_literal, G.root_rule, 'endmenu') ^ Menu,
@@ -214,6 +226,10 @@ kconfig_grammar.add_rules(
     prompt_exp=Row('prompt', G.string_literal, G.opt_condition_rule) ^ Prompt,
 
     default_exp=Row('default', G.value_exp, G.opt_condition_rule) ^ Default,
+
+    def_bool_exp=Row('def_bool', G.bool_literal, G.opt_condition_rule) ^ DefBool,
+
+    def_tristate_exp=Row('def_tristate', G.tristate_literal, G.opt_condition_rule) ^ DefTristate,
 
     select_exp=Row('select', G.identifier) ^ Select,
 
