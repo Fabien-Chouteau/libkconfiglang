@@ -186,7 +186,7 @@ kconfig_grammar.add_rules(
 
     # Options
 
-    # TODO: How to grap the text between help and the empty line
+    # TODO: How to grab the text between help and the empty line
     help_exp=Row('help', Tok(Token.EmptyLine)) ^ Help,
 
     type_exp=Row(Or(Tok(Token.Tristate,   keep=True),
