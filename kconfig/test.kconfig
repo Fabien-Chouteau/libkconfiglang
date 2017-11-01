@@ -1,24 +1,110 @@
-mainmenu "test main menu"
+mainmenu "Ada_Drivers_Library Configuration"
 
-menuconfig SYMBOL
-	bool "bool prompt"
+menu "Build options"
 
-if SYMBOL
+endmenu
 
-config CONFIG_1
-	tristate "Tristate prompt"
-	depends on SYMBOL && m
+menu "Middleware"
+
+menu "Filesystem"
+ config CONFIG_FILESYSTEM_MAX_PATH_LEN
+        int "Maximun path length"
+        default "1024"
+        range "1" "2048"
+        # help
+        #   This is a little help...
+
+endmenu
+endmenu
+
+menu "Board support"
+
+config CONFIG_ARCH_ARM
+       bool
+config CONFIG_ARCH_RISCV
+       bool
 
 choice
-        default CHOICE_TEST_1
+        prompt "Board variant" if TEST
+        default CONFIG_BOARD_CUSTOM if TEST
+        # help
+        #   Specific board variant to use
 
-        config CHOICE_TEST_1
-	       bool "choice bool prompt 1"
-	       depends on CONFIG_1 && y
-
-config CHOICE_TEST_2
-	       bool "choice bool prompt 2"
-	       depends on CONFIG_1 && m
+config CONFIG_BOARD_CUSTOM
+        bool "Custom board definition"
+config CONFIG_BOARD_STM32F4_DISCO
+        bool "STM32F4 Discovery"
+        select CONFIG_MCU_STM32F407
+config CONFIG_BOARD_OPENMV2
+        bool "OpenMV 2"
+        select CONFIG_MCU_STM32F427
+config CONFIG_BOARD_MICROBIT
+        bool "BBC Micro:Bit"
+        select CONFIG_MCU_NRF51
 endchoice
 
-endif # SYMBOL
+if CONFIG_BOARD_CUSTOM
+
+config CONFIG_BOARD_CUSTOM_SOURCE_DIR
+       string "Source directory for the custom board support"
+
+choice
+        prompt "Target Micro-controller familly Variant"
+        default CONFIG_SELECT_MCU_STM32
+        # help
+        #   Specific CPU variant to use
+config CONFIG_SELECT_MCU_CUSTOM
+        bool "Custom MCU definition"
+config CONFIG_SELECT_MCU_STM32
+        bool "STMicro STM32"
+config CONFIG_SELECT_MCU_SIFIVE
+        bool "SiFive RISC-V 32"
+config CONFIG_SELECT_MCU_NORDIC
+        bool "Nordic NRF5x"
+endchoice
+endif
+
+# Hidden ARM configs
+source "Config.arm.in"
+
+source "Config.stm32.in"
+source "Config.nordic.in"
+
+if CONFIG_SELECT_MCU_CUSTOM
+choice
+        prompt "Target Architecture Variant"
+        default CONFIG_SELECT_ARCH_CUSTOM       
+        # help
+        #   Specific CPU variant to use
+
+config CONFIG_SELECT_ARCH_CUSTOM
+        bool "Custom arch definition"
+config CONFIG_SELECT_ARCH_ARM
+        bool "ARM"
+        select CONFIG_ARCH_ARM
+config CONFIG_SELECT_ARCH_RISCV
+        bool "RISC-V"
+        select CONFIG_ARCH_RISCV
+endchoice
+endif
+
+if CONFIG_SELECT_ARCH_ARM
+choice
+        prompt "Target ARM Variant"
+        default CONFIG_ARCH_CORTEX_M4F
+        # help
+        #   Specific CPU variant to use
+
+config CONFIG_ARCH_CORTEX_M0
+        bool "ARM Cortex-M0"
+        select CONFIG_HAS_CORTEX_M0
+config CONFIG_ARCH_CORTEX_M0P
+        bool "ARM Cortex-M0+"
+        select CONFIG_HAS_CORTEX_M0P
+config CONFIG_ARCH_CORTEX_M4F
+        bool "ARM Cortex-M4F"
+        select CONFIG_HAS_CORTEX_M4F
+endchoice
+endif
+
+endmenu
