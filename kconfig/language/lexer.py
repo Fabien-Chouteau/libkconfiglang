@@ -4,8 +4,6 @@ from langkit.lexer import Lexer, LexerToken, Literal, WithText, \
 
 class Token(LexerToken):
 
-    Example = WithText()
-
     # Keywords
     Config = WithText()
     Menuconfig = WithText()
@@ -28,6 +26,12 @@ class Token(LexerToken):
     Imply = WithText()
     Range = WithText()
     Visible = WithText()
+
+    Option           = WithText()
+    OptDefConfigList = WithText()
+    OptModules       = WithText()
+    OptEnv           = WithText()
+    OptAllNoConfY    = WithText()
 
     # The help text is terminated by an empty line
     EmptyLine = WithText()
@@ -60,7 +64,6 @@ class Token(LexerToken):
 
 kconfig_lexer = Lexer(Token)
 kconfig_lexer.add_rules(
-    (Literal("example"),     Token.Example),
 
     (Pattern(r"[ \t\r\n]+"),  Ignore()),
     (Pattern(r"#.*"),         Ignore()),
@@ -87,6 +90,13 @@ kconfig_lexer.add_rules(
     (Literal("imply"),      Token.Imply),
     (Literal("range"),      Token.Range),
     (Literal("visible"),    Token.Visible),
+    (Literal("option"),     Token.Option),
+
+    # Options
+    (Literal("defconfig_list"),   Token.OptDefConfigList),
+    (Literal("modules"),          Token.OptModules),
+    (Literal("env"),              Token.OptEnv),
+    (Literal("allnoconfig_y"),    Token.OptAllNoConfY),
 
     # Types
     (Literal("tristate"),     Token.Tristate),

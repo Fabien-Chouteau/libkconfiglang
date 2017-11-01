@@ -106,6 +106,10 @@ class Range(Property):
     high      = Field()
     condition = Field()
 
+class Option(Property):
+    opt_name = Field()
+    value    = Field()
+
 @abstract
 class Expression(KConfigNode):
     pass
@@ -151,7 +155,8 @@ kconfig_grammar.add_rules(
                            G.range_exp,
                            G.comment_exp,
                            G.def_bool_exp,
-                           G.def_tristate_exp)),
+                           G.def_tristate_exp,
+                           G.option_exp)),
 
     config_list=List(G.config_rule, empty_valid=True),
 
@@ -167,7 +172,8 @@ kconfig_grammar.add_rules(
                                G.range_exp,
                                G.comment_exp,
                                G.def_bool_exp,
-                               G.def_tristate_exp)),
+                               G.def_tristate_exp,
+                               G.option_exp)),
 
     # Menu
     menu_rule=Row('menu', G.string_literal, G.root_rule, 'endmenu') ^ Menu,
@@ -240,6 +246,18 @@ kconfig_grammar.add_rules(
     range_exp=Row('range', G.value_exp, G.value_exp, G.opt_condition_rule) ^ Range,
 
     comment_exp=Row('comment', G.string_literal) ^ Comment,
+
+    # Misc options
+
+    # TODO: Here we could add handling of custom (user defined) options that
+    # would provide additional features for GPR files.
+    # For instance : option source_dir="src/some_feature"
+    option_exp=Row('option', Or(Tok(Token.OptDefConfigList, keep=True),
+                                Tok(Token.OptModules,       keep=True),
+                                Tok(Token.OptEnv,           keep=True),
+                                Tok(Token.OptAllNoConfY,    keep=True)
+                                ),
+                   Opt ('=', G.string_literal)) ^ Option,
 
     source_rule=Row('source', G.string_literal) ^ Source,
 
