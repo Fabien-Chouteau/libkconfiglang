@@ -105,7 +105,7 @@ kconfig_lexer.add_rules(
     (Literal("n"),                     Token.No),
     (Literal("m"),                     Token.Module),
 
-    (Pattern(r"[a-zA-Z][a-zA-Z0-9]*"),                                  Token.Identifier),
+    (Pattern(r"[a-zA-Z][a-zA-Z0-9_]*"),                                 Token.Identifier),
     (Pattern(r"[0-9]+"),                                                Token.Number),
     (Pattern(r"0x[0-9]+"),                                              Token.HexNumber),
     (Pattern(r'\"(\"\"|(\[\"([0-9A-F][0-9A-F]){2,4}\"\])|[^\n\"])*\"'), Token.String),
