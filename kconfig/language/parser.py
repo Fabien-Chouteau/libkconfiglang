@@ -62,6 +62,9 @@ class StringLiteral(KConfigNode):
 class Identifier(KConfigNode):
     ident = Field()
 
+class Comment(KConfigNode):
+    string = Field()
+
 @abstract
 class Property(KConfigNode):
     pass
@@ -135,7 +138,8 @@ kconfig_grammar.add_rules(
                            G.depends_exp,
                            G.select_exp,
                            G.help_exp,
-                           G.range_exp)),
+                           G.range_exp,
+                           G.comment_exp)),
 
     config_list=List(G.config_rule, empty_valid=True),
 
@@ -148,7 +152,8 @@ kconfig_grammar.add_rules(
                                G.depends_exp,
                                G.select_exp,
                                G.help_exp,
-                               G.range_exp)),
+                               G.range_exp,
+                               G.comment_exp)),
 
     # Menu
     menu_rule=Row('menu', G.string_literal, G.root_rule, 'endmenu') ^ Menu,
@@ -215,6 +220,8 @@ kconfig_grammar.add_rules(
     depends_exp=Row('depends', 'on', G.expr) ^ Depends,
 
     range_exp=Row('range', G.value_exp, G.value_exp) ^ Range,
+
+    comment_exp=Row('comment', G.string_literal) ^ Comment,
 
     source_rule=Row('source', G.string_literal) ^ Source,
 

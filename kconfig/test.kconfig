@@ -11,6 +11,7 @@ menu "Filesystem"
         int "Maximun path length"
         default "1024"
         range "1" "2048"
+        comment "test"
         # help
         #   This is a little help...
 
