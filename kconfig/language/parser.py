@@ -113,7 +113,8 @@ kconfig_grammar.add_rules(
                       G.source_rule,
                       G.menu_rule,
                       G.if_rule,
-                      G.choice_rule)),
+                      G.choice_rule),
+                   empty_valid=True),
 
     # Config
     config_rule=Row('config', G.identifier, G.config_options) ^ Config,
