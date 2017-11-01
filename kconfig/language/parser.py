@@ -140,16 +140,17 @@ G = kconfig_grammar
 kconfig_grammar.add_rules(
 
     # Main rule
-    main_rule=Row(Opt(G.mainmenu_rule), G.root_rule) ^ RootNode,
+    main_rule=Row(Opt(G.mainmenu_rule), G.block_rule) ^ RootNode,
 
-    # Root rule
-    root_rule=List(Or(G.config_rule,
-                      G.menuconfig_rule,
-                      G.source_rule,
-                      G.menu_rule,
-                      G.if_rule,
-                      G.choice_rule),
-                   empty_valid=True),
+    # Block rule
+    block_rule=List(Or(G.config_rule,
+                       G.menuconfig_rule,
+                       G.source_rule,
+                       G.menu_rule,
+                       G.comment_exp,
+                       G.if_rule,
+                       G.choice_rule),
+                    empty_valid=True),
 
     # Config
     config_rule=Row('config', G.identifier, G.config_options) ^ Config,
@@ -186,10 +187,10 @@ kconfig_grammar.add_rules(
                                G.option_exp)),
 
     # Menu
-    menu_rule=Row('menu', G.string_literal, Opt (G.visible_exp), G.root_rule, 'endmenu') ^ Menu,
+    menu_rule=Row('menu', G.string_literal, Opt (G.visible_exp), G.block_rule, 'endmenu') ^ Menu,
 
     # If
-    if_rule=Row('if', G.expr, G.root_rule, 'endif') ^ If,
+    if_rule=Row('if', G.expr, G.block_rule, 'endif') ^ If,
 
     # Choice
     choice_rule=Row('choice', G.choice_options, G.config_list, 'endchoice') ^ Choice,
