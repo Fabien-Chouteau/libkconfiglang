@@ -80,6 +80,7 @@ kconfig_lexer.add_rules(
     (Literal("depends"),    Token.Depends),
     (Literal("on"),         Token.On),
     (Literal("help"),       Token.Help),
+    (Literal("--help--"),   Token.Help),
     (Literal("prompt"),     Token.Prompt),
     (Literal("default"),    Token.Default),
     (Literal("select"),     Token.Select),
