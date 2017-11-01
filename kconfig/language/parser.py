@@ -102,8 +102,9 @@ class Prompt(Property):
     condition  = Field()
 
 class Range(Property):
-    low = Field()
-    high = Field()
+    low       = Field()
+    high      = Field()
+    condition = Field()
 
 @abstract
 class Expression(KConfigNode):
@@ -236,7 +237,7 @@ kconfig_grammar.add_rules(
 
     depends_exp=Row('depends', 'on', G.expr) ^ Depends,
 
-    range_exp=Row('range', G.value_exp, G.value_exp) ^ Range,
+    range_exp=Row('range', G.value_exp, G.value_exp, G.opt_condition_rule) ^ Range,
 
     comment_exp=Row('comment', G.string_literal) ^ Comment,
 

@@ -15,7 +15,7 @@ menu "Filesystem"
  config CONFIG_FILESYSTEM_MAX_PATH_LEN
         int "Maximun path length"
         default "1024"
-        range "1" "2048"
+        range "1" "2048" if LOL
         comment "test"
         # help
         #   This is a little help...
