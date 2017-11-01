@@ -1,6 +1,7 @@
 mainmenu "Ada_Drivers_Library Configuration"
 
 menu "Build options"
+     visible if TEST
 
 config TEST_1
        def_bool y if LOL

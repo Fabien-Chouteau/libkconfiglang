@@ -28,8 +28,9 @@ class Choice(KConfigNode):
     configs = Field()
 
 class Menu(KConfigNode):
-    text = Field()
-    child = Field()
+    text    = Field()
+    visible = Field()
+    child   = Field()
 
 class MainMenu(KConfigNode):
     Title = Field()
@@ -69,6 +70,9 @@ class Identifier(KConfigNode):
 
 class Comment(KConfigNode):
     string = Field()
+
+class Visible(KConfigNode):
+    condition = Field()
 
 @abstract
 class Property(KConfigNode):
@@ -182,7 +186,7 @@ kconfig_grammar.add_rules(
                                G.option_exp)),
 
     # Menu
-    menu_rule=Row('menu', G.string_literal, G.root_rule, 'endmenu') ^ Menu,
+    menu_rule=Row('menu', G.string_literal, Opt (G.visible_exp), G.root_rule, 'endmenu') ^ Menu,
 
     # If
     if_rule=Row('if', G.expr, G.root_rule, 'endif') ^ If,
@@ -248,6 +252,8 @@ kconfig_grammar.add_rules(
     select_exp=Row('select', G.identifier, G.opt_condition_rule) ^ Select,
 
     imply_exp=Row('imply', G.identifier, G.opt_condition_rule) ^ Imply,
+
+    visible_exp=Row('visible', 'if', G.expr) ^ Visible,
 
     depends_exp=Row('depends', 'on', G.expr) ^ Depends,
 
