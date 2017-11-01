@@ -35,7 +35,8 @@ class MainMenu(KConfigNode):
     Title = Field()
 
 class Select(KConfigNode):
-    symbol = Field()
+    symbol    = Field()
+    condition = Field()
 
 class If(KConfigNode):
     expr  = Field()
@@ -231,7 +232,7 @@ kconfig_grammar.add_rules(
 
     def_tristate_exp=Row('def_tristate', G.tristate_literal, G.opt_condition_rule) ^ DefTristate,
 
-    select_exp=Row('select', G.identifier) ^ Select,
+    select_exp=Row('select', G.identifier, G.opt_condition_rule) ^ Select,
 
     depends_exp=Row('depends', 'on', G.expr) ^ Depends,
 
