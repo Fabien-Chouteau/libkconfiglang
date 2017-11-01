@@ -1,0 +1,24 @@
+mainmenu "test main menu"
+
+menuconfig SYMBOL
+	bool "bool prompt"
+
+if SYMBOL
+
+config CONFIG_1
+	tristate "Tristate prompt"
+	depends on SYMBOL && m
+
+choice
+        default CHOICE_TEST_1
+
+        config CHOICE_TEST_1
+	       bool "choice bool prompt 1"
+	       depends on CONFIG_1 && y
+
+config CHOICE_TEST_2
+	       bool "choice bool prompt 2"
+	       depends on CONFIG_1 && m
+endchoice
+
+endif # SYMBOL
