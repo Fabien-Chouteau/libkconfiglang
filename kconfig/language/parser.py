@@ -75,13 +75,19 @@ class Help(Property):
     pass
 
 class Default(Property):
-    value = Field()
+    value     = Field()
+    condition = Field()
+
+class DefaultChoice(Property):
+    value     = Field()
+    condition = Field()
 
 class Depends(Property):
     identifier = Field()
 
 class Prompt(Property):
     prompt_str = Field()
+    condition  = Field()
 
 class Range(Property):
     low = Field()
@@ -156,13 +162,16 @@ kconfig_grammar.add_rules(
                            G.prompt_exp,
                            G.default_choice_exp)),
 
-    default_choice_exp=Row('default', G.identifier),
+    default_choice_exp=Row('default', G.identifier, G.opt_condition_rule) ^ DefaultChoice,
 
     # Symbol
     identifier=Tok(Token.Identifier, keep=True) ^ Identifier,
 
     # Mainmenu
     mainmenu_rule=Row('mainmenu', G.string_literal) ^ MainMenu,
+
+    # Optional condition
+    opt_condition_rule=Opt('if', G.expr),
 
     # Literals
     tristate_literal=Or(Tok(Token.Yes, keep=True),
@@ -197,9 +206,9 @@ kconfig_grammar.add_rules(
                     ),
                  Opt (G.string_literal)) ^ Type,
 
-    prompt_exp=Row('prompt', G.string_literal) ^ Prompt,
+    prompt_exp=Row('prompt', G.string_literal, G.opt_condition_rule) ^ Prompt,
 
-    default_exp=Row('default', G.value_exp) ^ Default,
+    default_exp=Row('default', G.value_exp, G.opt_condition_rule) ^ Default,
 
     select_exp=Row('select', G.identifier) ^ Select,
 
