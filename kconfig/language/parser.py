@@ -140,74 +140,74 @@ G = kconfig_grammar
 kconfig_grammar.add_rules(
 
     # Main rule
-    main_rule=Row(Opt(G.mainmenu_rule), G.block_rule) ^ RootNode,
+    main_rule=Row(Opt(G.mainmenu), G.block) ^ RootNode,
 
     # Block rule
-    block_rule=List(Or(G.config_rule,
-                       G.menuconfig_rule,
-                       G.source_rule,
-                       G.menu_rule,
-                       G.comment_exp,
-                       G.if_rule,
-                       G.choice_rule),
-                    empty_valid=True),
+    block=List(Or(G.config,
+                  G.menuconfig,
+                  G.source,
+                  G.menu,
+                  G.comment,
+                  G.if_rule,
+                  G.choice),
+               empty_valid=True),
 
     # Config
-    config_rule=Row('config', G.identifier, G.config_options) ^ Config,
+    config=Row('config', G.identifier, G.config_options) ^ Config,
 
-    config_options=List(Or(G.type_exp,
-                           G.prompt_exp,
-                           G.default_exp,
-                           G.depends_exp,
-                           G.select_exp,
-                           G.imply_exp,
-                           G.help_exp,
-                           G.range_exp,
-                           G.comment_exp,
-                           G.def_bool_exp,
-                           G.def_tristate_exp,
-                           G.option_exp)),
+    config_options=List(Or(G.type,
+                           G.prompt,
+                           G.default,
+                           G.depends,
+                           G.select,
+                           G.imply,
+                           G.help,
+                           G.range,
+                           G.comment,
+                           G.def_bool,
+                           G.def_tristate,
+                           G.option)),
 
-    config_list=List(G.config_rule, empty_valid=True),
+    config_list=List(G.config, empty_valid=True),
 
     # Menuconfig
-    menuconfig_rule=Row('menuconfig', G.identifier, G.menuconfig_options) ^ MenuConfig,
+    menuconfig=Row('menuconfig', G.identifier, G.menuconfig_options) ^ MenuConfig,
 
-    menuconfig_options=List(Or(G.type_exp,
-                               G.prompt_exp,
-                               G.default_exp,
-                               G.depends_exp,
-                               G.select_exp,
-                               G.imply_exp,
-                               G.help_exp,
-                               G.range_exp,
-                               G.comment_exp,
-                               G.def_bool_exp,
-                               G.def_tristate_exp,
-                               G.option_exp)),
+    menuconfig_options=List(Or(G.type,
+                               G.prompt,
+                               G.default,
+                               G.depends,
+                               G.select,
+                               G.imply,
+                               G.help,
+                               G.range,
+                               G.comment,
+                               G.def_bool,
+                               G.def_tristate,
+                               G.option)),
 
     # Menu
-    menu_rule=Row('menu', G.string_literal, Opt (G.visible_exp), G.block_rule, 'endmenu') ^ Menu,
+    menu=Row('menu', G.string_literal, Opt (G.visible), G.block, 'endmenu') ^ Menu,
 
     # If
-    if_rule=Row('if', G.expr, G.block_rule, 'endif') ^ If,
+    if_rule=Row('if', G.expr, G.block, 'endif') ^ If,
 
     # Choice
-    choice_rule=Row('choice', G.choice_options, G.config_list, 'endchoice') ^ Choice,
-    choice_options=List(Or(G.depends_exp,
-                           G.prompt_exp,
-                           G.default_choice_exp)),
+    choice=Row('choice', G.choice_options, G.config_list, 'endchoice') ^ Choice,
+    choice_options=List(Or(G.depends,
+                           G.prompt,
+                           G.default_choice)),
 
-    default_choice_exp=Row('default', G.identifier, G.opt_condition_rule) ^ DefaultChoice,
+    default_choice=Row('default', G.identifier, G.opt_condition) ^ DefaultChoice,
 
     # Symbol
     identifier=Tok(Token.Identifier, keep=True) ^ Identifier,
 
     # Mainmenu
-    mainmenu_rule=Row('mainmenu', G.string_literal) ^ MainMenu,
+    mainmenu=Row('mainmenu', G.string_literal) ^ MainMenu,
 
     # Optional condition
-    opt_condition_rule=Opt('if', G.expr),
+    opt_condition=Opt('if', G.expr),
 
     # Literals
     tristate_literal=Or(Tok(Token.Yes, keep=True),
@@ -215,7 +215,7 @@ kconfig_grammar.add_rules(
                         Tok(Token.Module, keep=True)) ^ TristateLiteral,
 
     bool_literal=Or(Tok(Token.Yes, keep=True),
-                   Tok(Token.No, keep=True)) ^ BoolLiteral,
+                    Tok(Token.No, keep=True)) ^ BoolLiteral,
 
     int_literal=Tok(Token.Number, keep=True) ^ IntLiteral,
 
@@ -223,58 +223,58 @@ kconfig_grammar.add_rules(
 
     string_literal=Tok(Token.String, keep=True) ^ StringLiteral,
 
-    value_exp=Or(G.tristate_literal,
-                 G.bool_literal,
-                 G.int_literal,
-                 G.hex_literal,
-                 G.string_literal),
+    value=Or(G.tristate_literal,
+             G.bool_literal,
+             G.int_literal,
+             G.hex_literal,
+             G.string_literal),
 
     # Options
 
     # TODO: How to grab the text between help and the empty line
-    help_exp=Row('help', Tok(Token.EmptyLine)) ^ Help,
+    help=Row('help', Tok(Token.EmptyLine)) ^ Help,
 
-    type_exp=Row(Or(Tok(Token.Tristate,   keep=True),
-                    Tok(Token.Bool,       keep=True),
-                    Tok(Token.Int,        keep=True),
-                    Tok(Token.Hex,        keep=True),
-                    Tok(Token.StringType, keep=True)
-                    ),
-                 Opt (G.string_literal)) ^ Type,
+    type=Row(Or(Tok(Token.Tristate,   keep=True),
+                Tok(Token.Bool,       keep=True),
+                Tok(Token.Int,        keep=True),
+                Tok(Token.Hex,        keep=True),
+                Tok(Token.StringType, keep=True)
+                ),
+             Opt (G.string_literal)) ^ Type,
 
-    prompt_exp=Row('prompt', G.string_literal, G.opt_condition_rule) ^ Prompt,
+    prompt=Row('prompt', G.string_literal, G.opt_condition) ^ Prompt,
 
-    default_exp=Row('default', G.value_exp, G.opt_condition_rule) ^ Default,
+    default=Row('default', G.value, G.opt_condition) ^ Default,
 
-    def_bool_exp=Row('def_bool', G.bool_literal, G.opt_condition_rule) ^ DefBool,
+    def_bool=Row('def_bool', G.bool_literal, G.opt_condition) ^ DefBool,
 
-    def_tristate_exp=Row('def_tristate', G.tristate_literal, G.opt_condition_rule) ^ DefTristate,
+    def_tristate=Row('def_tristate', G.tristate_literal, G.opt_condition) ^ DefTristate,
 
-    select_exp=Row('select', G.identifier, G.opt_condition_rule) ^ Select,
+    select=Row('select', G.identifier, G.opt_condition) ^ Select,
 
-    imply_exp=Row('imply', G.identifier, G.opt_condition_rule) ^ Imply,
+    imply=Row('imply', G.identifier, G.opt_condition) ^ Imply,
 
-    visible_exp=Row('visible', 'if', G.expr) ^ Visible,
+    visible=Row('visible', 'if', G.expr) ^ Visible,
 
-    depends_exp=Row('depends', 'on', G.expr) ^ Depends,
+    depends=Row('depends', 'on', G.expr) ^ Depends,
 
-    range_exp=Row('range', G.value_exp, G.value_exp, G.opt_condition_rule) ^ Range,
+    range=Row('range', G.value, G.value, G.opt_condition) ^ Range,
 
-    comment_exp=Row('comment', G.string_literal) ^ Comment,
+    comment=Row('comment', G.string_literal) ^ Comment,
 
     # Misc options
 
     # TODO: Here we could add handling of custom (user defined) options that
     # would provide additional features for GPR files.
     # For instance : option source_dir="src/some_feature"
-    option_exp=Row('option', Or(Tok(Token.OptDefConfigList, keep=True),
-                                Tok(Token.OptModules,       keep=True),
-                                Tok(Token.OptEnv,           keep=True),
-                                Tok(Token.OptAllNoConfY,    keep=True)
-                                ),
-                   Opt ('=', G.string_literal)) ^ Option,
+    option=Row('option', Or(Tok(Token.OptDefConfigList, keep=True),
+                            Tok(Token.OptModules,       keep=True),
+                            Tok(Token.OptEnv,           keep=True),
+                            Tok(Token.OptAllNoConfY,    keep=True)
+                            ),
+               Opt ('=', G.string_literal)) ^ Option,
 
-    source_rule=Row('source', G.string_literal) ^ Source,
+    source=Row('source', G.string_literal) ^ Source,
 
     # Expressions
 
