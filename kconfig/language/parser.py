@@ -1,10 +1,9 @@
-from langkit.compiled_types import ASTNode, abstract, root_grammar_class, \
-     Field, EnumType
-from langkit.parsers import Grammar, Row, List, Or, Tok, Opt, Enum
+from langkit.dsl import ASTNode, EnumNode, Field, abstract
+from langkit.parsers import Grammar, List, Opt, Or, Pick
+
 from lexer import Token
 
 @abstract
-@root_grammar_class()
 class KConfigNode(ASTNode):
     """
     Root node class for KConfig AST nodes.
@@ -33,7 +32,7 @@ class Menu(KConfigNode):
     child   = Field()
 
 class MainMenu(KConfigNode):
-    Title = Field()
+    title = Field()
 
 class Select(KConfigNode):
     symbol    = Field()
@@ -51,22 +50,22 @@ class Source(KConfigNode):
     filename = Field()
 
 class TristateLiteral(KConfigNode):
-    value = Field()
+    token_node = True
 
 class BoolLiteral(KConfigNode):
-    value = Field()
+    token_node = True
 
 class IntLiteral(KConfigNode):
-    value = Field()
+    token_node = True
 
 class HexLiteral(KConfigNode):
-    value = Field()
+    token_node = True
 
 class StringLiteral(KConfigNode):
-    value = Field()
+    token_node = True
 
 class Identifier(KConfigNode):
-    ident = Field()
+    token_node = True
 
 class Comment(KConfigNode):
     string = Field()
@@ -77,6 +76,9 @@ class Visible(KConfigNode):
 @abstract
 class Property(KConfigNode):
     pass
+
+class BuiltinType(KConfigNode):
+    token_node = True
 
 class Type(Property):
     type_id = Field()
@@ -114,6 +116,9 @@ class Range(Property):
     high      = Field()
     condition = Field()
 
+class OptionName(KConfigNode):
+    token_node = True
+
 class Option(Property):
     opt_name = Field()
     value    = Field()
@@ -123,9 +128,9 @@ class Expression(KConfigNode):
     pass
 
 class NotExpr(Expression):
-    A = Field()
+    a = Field()
 
-class Operator(EnumType):
+class Operator(EnumNode):
     alternatives = ['equal_op', 'diff_op', 'and_op', 'or_op']
 
 class BinaryExpr(Expression):
@@ -201,7 +206,7 @@ kconfig_grammar.add_rules(
     default_choice=DefaultChoice('default', G.identifier, G.opt_condition),
 
     # Symbol
-    identifier=Identifier(Tok(Token.Identifier, keep=True)),
+    identifier=Identifier(Token.Identifier),
 
     # Mainmenu
     mainmenu=MainMenu('mainmenu', G.string_literal),
@@ -210,18 +215,15 @@ kconfig_grammar.add_rules(
     opt_condition=Opt('if', G.expr),
 
     # Literals
-    tristate_literal=TristateLiteral (Or(Tok(Token.Yes, keep=True),
-                                         Tok(Token.No, keep=True),
-                                         Tok(Token.Module, keep=True))),
+    tristate_literal=TristateLiteral(Or(Token.Yes, Token.No, Token.Module)),
 
-    bool_literal=BoolLiteral(Or(Tok(Token.Yes, keep=True),
-                                Tok(Token.No, keep=True))),
+    bool_literal=BoolLiteral(Or(Token.Yes, Token.No)),
 
-    int_literal=IntLiteral(Tok(Token.Number, keep=True)),
+    int_literal=IntLiteral(Token.Number),
 
-    hex_literal=HexLiteral(Tok(Token.HexNumber, keep=True)),
+    hex_literal=HexLiteral(Token.HexNumber),
 
-    string_literal=StringLiteral(Tok(Token.String, keep=True)),
+    string_literal=StringLiteral(Token.String),
 
     value=Or(G.tristate_literal,
              G.bool_literal,
@@ -232,15 +234,14 @@ kconfig_grammar.add_rules(
     # Options
 
     # TODO: How to grab the text between help and the empty line
-    help=Help('help', Tok(Token.EmptyLine)),
+    help=Help('help', Token.EmptyLine),
 
-    type=Type(Or(Tok(Token.Tristate,   keep=True),
-                 Tok(Token.Bool,       keep=True),
-                 Tok(Token.Int,        keep=True),
-                 Tok(Token.Hex,        keep=True),
-                 Tok(Token.StringType, keep=True)
-                 ),
-              Opt (G.string_literal)),
+    type=Type(BuiltinType(Or(Token.Tristate,
+                             Token.Bool,
+                             Token.Int,
+                             Token.Hex,
+                             Token.StringType)),
+              Opt(G.string_literal)),
 
     prompt=Prompt('prompt', G.string_literal, G.opt_condition),
 
@@ -267,25 +268,23 @@ kconfig_grammar.add_rules(
     # TODO: Here we could add handling of custom (user defined) options that
     # would provide additional features for GPR files.
     # For instance : option source_dir="src/some_feature"
-    option=Option('option', Or(Tok(Token.OptDefConfigList, keep=True),
-                               Tok(Token.OptModules,       keep=True),
-                               Tok(Token.OptEnv,           keep=True),
-                               Tok(Token.OptAllNoConfY,    keep=True)
-                               ),
-                  Opt ('=', G.string_literal)),
+    option=Option('option', OptionName(Or(Token.OptDefConfigList,
+                                          Token.OptModules,
+                                          Token.OptEnv,
+                                          Token.OptAllNoConfY)),
+                  Opt('=', G.string_literal)),
 
     source=Source('source', G.string_literal),
 
     # Expressions
 
-    expr=Or(Row('(', G.expr, ')')[1],
+    expr=Or(Pick('(', G.expr, ')'),
             BinaryExpr(G.expr,
-                       Or(Enum('=', Operator('equal_op')),
-                          Enum('!=', Operator('diff_op')),
-                          Enum('&&', Operator('and_op')),
-                          Enum('||', Operator('or_op'))),
-                       G.expr
-                       ),
+                       Or(Operator.alt_equal_op('='),
+                          Operator.alt_diff_op('!='),
+                          Operator.alt_and_op('&&'),
+                          Operator.alt_or_op('||')),
+                       G.expr),
             G.identifier,
             G.bool_literal,
             G.tristate_literal,
